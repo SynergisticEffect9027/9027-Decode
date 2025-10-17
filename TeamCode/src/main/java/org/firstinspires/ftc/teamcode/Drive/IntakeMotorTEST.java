@@ -9,7 +9,7 @@ public class IntakeMotorTEST extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    private DcMotor intakeMotor;
+    private DcMotor intakeMotor = null;
 
     @Override
     public void runOpMode() {

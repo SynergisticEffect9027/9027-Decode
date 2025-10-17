@@ -10,7 +10,7 @@ public class ContinuousServoTEST extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    CRServo testServo;
+    private CRServo testServo;
 
     @Override
     public void runOpMode() {
