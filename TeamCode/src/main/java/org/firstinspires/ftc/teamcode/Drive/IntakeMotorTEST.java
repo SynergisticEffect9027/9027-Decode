@@ -15,6 +15,7 @@ public class IntakeMotorTEST extends LinearOpMode {
     public void runOpMode() {
         intakeMotor = hardwareMap.get(DcMotor.class, "testServo");
 
+        intakeMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
