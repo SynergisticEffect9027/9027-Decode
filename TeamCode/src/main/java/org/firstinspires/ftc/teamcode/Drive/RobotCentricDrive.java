@@ -5,6 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import android.util.Size;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import java.util.List;
 
 /*
  * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
@@ -21,7 +27,20 @@ public class RobotCentricDrive extends LinearOpMode {
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
     private DcMotor intakeMotor = null;
+    private DcMotor leftTurretMotor;
+    private DcMotor rightTurretMotor;
+    private DcMotor turretMotor;
     private CRServo flywheel;
+    private AprilTagProcessor aprilTag;
+    private VisionPortal visionPortal;
+    private final double kP = 0.002;
+    private final double kI = 0.0;
+    private final double kD = 0.0005;
+    private double previousError = 0;
+    private double integral = 0;
+    private Boolean turretEnable = true;
+
+
 
     @Override
     public void runOpMode() {
@@ -34,6 +53,8 @@ public class RobotCentricDrive extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
         flywheel = hardwareMap.get(CRServo.class, "Flywheel");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        leftTurretMotor = hardwareMap.get(DcMotor.class, "leftTurretMotor");
+        rightTurretMotor = hardwareMap.get(DcMotor.class, "rightTurretMotor");
 
 
         //Setting motor direction and config servo for continuous movement.
@@ -42,7 +63,19 @@ public class RobotCentricDrive extends LinearOpMode {
         frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.REVERSE);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftTurretMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightTurretMotor.setDirection(DcMotor.Direction.REVERSE);
         flywheel.resetDeviceConfigurationForOpMode();
+
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        aprilTag = new AprilTagProcessor.Builder().build();
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .addProcessor(aprilTag)
+                .setCameraResolution(new Size(640, 480))
+                .build();
+
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -100,11 +133,10 @@ public class RobotCentricDrive extends LinearOpMode {
             backLeftDrive.setPower(Math.pow(backLeftPower, 3));
             backRightDrive.setPower(Math.pow(backRightPower, 3));
 
-            if (gamepad1.a) {
+            if (gamepad2.right_trigger > 0.000000 ) {
                 flywheel.setPower(1.0);
-            } else if (gamepad1.b) {
-                flywheel.setPower(-1.0);
-            } else {
+            }
+            else {
                 flywheel.setPower(0.0);
             }
 
@@ -115,6 +147,49 @@ public class RobotCentricDrive extends LinearOpMode {
                 intakeMotor.setPower(-1.0);
             } else {
                 intakeMotor.setPower(0.0);
+            }
+            if (gamepad1.left_trigger > 0.0000 ) {
+                leftTurretMotor.setPower(1.0);
+                rightTurretMotor.setPower(1.0);
+            }
+            else if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
+                leftTurretMotor.setPower(0);
+                rightTurretMotor.setPower(0);
+            }
+
+            List<AprilTagDetection> detections = aprilTag.getDetections();
+            if  (gamepad2.bWasReleased()){
+                turretEnable = !turretEnable;
+            }
+
+            if (turretEnable) {
+                if (!detections.isEmpty()) {
+                    AprilTagDetection tag = detections.get(0);
+                    double targetX = tag.center.x;
+                    double imageCenterX = 640 / 2.0;
+
+                    double error = targetX - imageCenterX;
+                    integral += error;
+                    double derivative = error - previousError;
+
+                    double output = (kP * error) + (kI * integral) + (kD * derivative);
+                    output = Math.max(-0.3, Math.min(0.3, output));
+
+                    turretMotor.setPower(output);
+                    previousError = error;
+                    telemetry.addData("Error", error);
+                } else {
+                    turretMotor.setPower(0);
+                    telemetry.addLine("No target detected");
+                }
+            } else {
+                if (gamepad2.dpad_left) {
+                    turretMotor.setPower(-0.1);
+                } else if (gamepad2.dpad_right) {
+                    turretMotor.setPower(0.1);
+                } else {
+                    turretMotor.setPower(0);
+                }
             }
 
                 // Show the elapsed game time and wheel power.
