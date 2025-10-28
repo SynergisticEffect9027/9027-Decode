@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Drive;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,12 +14,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Robot Centric Drive", group="Linear OpMode")
 public class RobotCentricDrive extends LinearOpMode {
 
-    // Declare OpMode members for each of the 4 motors.
+    // Declare servos and motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor frontLeftDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
+    private DcMotor intakeMotor = null;
+    private CRServo flywheel;
 
     @Override
     public void runOpMode() {
@@ -30,12 +32,17 @@ public class RobotCentricDrive extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
         frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
+        flywheel = hardwareMap.get(CRServo.class, "Flywheel");
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
 
+        //Setting motor direction and config servo for continuous movement.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        intakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        flywheel.resetDeviceConfigurationForOpMode();
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -45,6 +52,8 @@ public class RobotCentricDrive extends LinearOpMode {
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
+        //Get Henry's code to smash together for turret autolocking and other things that I just don't think about.
+        //Meet with drivers on control preferences.
         while (opModeIsActive()) {
             double max;
 
@@ -90,6 +99,23 @@ public class RobotCentricDrive extends LinearOpMode {
             frontRightDrive.setPower(Math.pow(frontRightPower, 3));
             backLeftDrive.setPower(Math.pow(backLeftPower, 3));
             backRightDrive.setPower(Math.pow(backRightPower, 3));
+
+            if (gamepad1.a) {
+                flywheel.setPower(1.0);
+            } else if (gamepad1.b) {
+                flywheel.setPower(-1.0);
+            } else {
+                flywheel.setPower(0.0);
+            }
+
+            //Change these once we get Dominic's equation for velocity power.
+            if (gamepad1.x) {
+                intakeMotor.setPower(1.0);
+            } else if (gamepad1.y) {
+                intakeMotor.setPower(-1.0);
+            } else {
+                intakeMotor.setPower(0.0);
+            }
 
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());

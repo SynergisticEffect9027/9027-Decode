@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Passthrough+Launcher TEST")
-public class IntakePassthrough extends LinearOpMode {
+public class IntakePassthroughTEST extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor intakeMotor = null;
