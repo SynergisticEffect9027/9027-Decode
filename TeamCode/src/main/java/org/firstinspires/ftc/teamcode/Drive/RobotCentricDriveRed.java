@@ -17,8 +17,8 @@ import java.util.List;
  * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
  * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
  */
-@TeleOp(name="Robot Centric Drive", group="Linear OpMode")
-public class RobotCentricDrive extends LinearOpMode {
+@TeleOp(name="Robot Centric Drive (RED)", group="Linear OpMode")
+public class RobotCentricDriveRed extends LinearOpMode {
 
     // Declare servos and motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -163,12 +163,20 @@ public class RobotCentricDrive extends LinearOpMode {
             }
 
             if (turretEnable) {
-                if (!detections.isEmpty()) {
-                    AprilTagDetection tag = detections.get(0);
-                    double targetX = tag.center.x;
-                    double imageCenterX = 640 / 2.0;
+                AprilTagDetection redGoalTag = null;
 
+                for (AprilTagDetection tag : detections) {
+                    if (tag.id == 24) {
+                        redGoalTag = tag;
+                        break;
+                    }
+                }
+
+                if (redGoalTag != null) {
+                    double targetX = redGoalTag.center.x;
+                    double imageCenterX = 640 / 2.0;
                     double error = targetX - imageCenterX;
+
                     integral += error;
                     double derivative = error - previousError;
 
