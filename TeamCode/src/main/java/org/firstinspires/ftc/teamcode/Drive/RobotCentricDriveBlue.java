@@ -60,8 +60,8 @@ public class RobotCentricDriveBlue extends LinearOpMode {
         //Setting motor direction and config servo for continuous movement.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
         leftTurretMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -134,6 +134,9 @@ public class RobotCentricDriveBlue extends LinearOpMode {
             backLeftDrive.setPower(Math.pow(backLeftPower, 3));
             backRightDrive.setPower(Math.pow(backRightPower, 3));
 
+            if (gamepad2.y){
+                flywheel.setPower(-1.0);
+            }
             if (gamepad2.right_trigger > 0.000000) {
                 flywheel.setPower(1.0);
             } else {
@@ -141,18 +144,18 @@ public class RobotCentricDriveBlue extends LinearOpMode {
             }
 
             //Change these once we get Dominic's equation for velocity power.
-            if (gamepad1.x) {
+            if (gamepad2.x) {
                 intakeMotor.setPower(1.0);
-            } else if (gamepad1.y) {
+            } else if (gamepad2.y) {
                 intakeMotor.setPower(-1.0);
             } else {
                 intakeMotor.setPower(0.0);
             }
-            if (gamepad1.left_trigger > 0.0000) {
+            if (gamepad2.left_trigger > 0.0000) {
                 leftTurretMotor.setPower(1.0);
                 rightTurretMotor.setPower(1.0);
 
-            } else if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
+            } else {
                 leftTurretMotor.setPower(0);
                 rightTurretMotor.setPower(0);
             }

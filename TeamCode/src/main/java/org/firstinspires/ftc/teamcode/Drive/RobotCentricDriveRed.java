@@ -136,6 +136,9 @@ public class RobotCentricDriveRed extends LinearOpMode {
             backLeftDrive.setPower(Math.pow(backLeftPower, 3));
             backRightDrive.setPower(Math.pow(backRightPower, 3));
 
+            if (gamepad2.y){
+                flywheel.setPower(-1.0);
+            }
             if (gamepad2.right_trigger > 0.000000 ) {
                 flywheel.setPower(1.0);
             }
@@ -155,7 +158,7 @@ public class RobotCentricDriveRed extends LinearOpMode {
                 leftTurretMotor.setPower(1.0);
                 rightTurretMotor.setPower(1.0);
             }
-            else if (gamepad2.left_trigger > 0.0000 && gamepad2.left_trigger < 0.0001) {
+            else {
                 leftTurretMotor.setPower(0);
                 rightTurretMotor.setPower(0);
             }
