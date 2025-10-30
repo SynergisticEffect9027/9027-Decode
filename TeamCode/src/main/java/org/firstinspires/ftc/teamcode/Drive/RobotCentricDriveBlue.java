@@ -50,6 +50,7 @@ public class RobotCentricDriveBlue extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
         frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
+        turretMotor = hardwareMap.get(DcMotor.class, "turretMotor");
         flywheel = hardwareMap.get(CRServo.class, "Flywheel");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         leftTurretMotor = hardwareMap.get(DcMotor.class, "leftTurretMotor");
@@ -59,11 +60,12 @@ public class RobotCentricDriveBlue extends LinearOpMode {
         //Setting motor direction and config servo for continuous movement.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
-        leftTurretMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightTurretMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftTurretMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightTurretMotor.setDirection(DcMotor.Direction.FORWARD);
         flywheel.resetDeviceConfigurationForOpMode();
 
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -149,13 +151,14 @@ public class RobotCentricDriveBlue extends LinearOpMode {
             if (gamepad1.left_trigger > 0.0000) {
                 leftTurretMotor.setPower(1.0);
                 rightTurretMotor.setPower(1.0);
+
             } else if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
                 leftTurretMotor.setPower(0);
                 rightTurretMotor.setPower(0);
             }
 
             List<AprilTagDetection> detections = aprilTag.getDetections();
-            if (gamepad2.bWasReleased()) {
+            if  (gamepad2.b){
                 turretEnable = !turretEnable;
             }
 

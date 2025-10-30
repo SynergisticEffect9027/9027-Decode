@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import android.util.Size;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -51,6 +52,7 @@ public class RobotCentricDriveRed extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
         frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
+        turretMotor = hardwareMap.get(DcMotor.class, "turretMotor");
         flywheel = hardwareMap.get(CRServo.class, "Flywheel");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         leftTurretMotor = hardwareMap.get(DcMotor.class, "leftTurretMotor");
@@ -59,12 +61,13 @@ public class RobotCentricDriveRed extends LinearOpMode {
 
         //Setting motor direction and config servo for continuous movement.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
-        leftTurretMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightTurretMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftTurretMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightTurretMotor.setDirection(DcMotor.Direction.FORWARD);
         flywheel.resetDeviceConfigurationForOpMode();
 
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -141,24 +144,24 @@ public class RobotCentricDriveRed extends LinearOpMode {
             }
 
             //Change these once we get Dominic's equation for velocity power.
-            if (gamepad1.x) {
+            if (gamepad2.x) {
                 intakeMotor.setPower(1.0);
-            } else if (gamepad1.y) {
+            } else if (gamepad2.y) {
                 intakeMotor.setPower(-1.0);
             } else {
                 intakeMotor.setPower(0.0);
             }
-            if (gamepad1.left_trigger > 0.0000 ) {
+            if (gamepad2.left_trigger > 0.0000 ) {
                 leftTurretMotor.setPower(1.0);
                 rightTurretMotor.setPower(1.0);
             }
-            else if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
+            else if (gamepad2.left_trigger > 0.0000 && gamepad2.left_trigger < 0.0001) {
                 leftTurretMotor.setPower(0);
                 rightTurretMotor.setPower(0);
             }
 
             List<AprilTagDetection> detections = aprilTag.getDetections();
-            if  (gamepad2.bWasReleased()){
+            if  (gamepad2.b){
                 turretEnable = !turretEnable;
             }
 
