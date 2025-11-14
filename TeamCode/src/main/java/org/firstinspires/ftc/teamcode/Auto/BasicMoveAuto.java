@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
         static final double     WHEEL_DIAMETER_INCHES   = 3.9 ;     // For figuring circumference
         static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                 (WHEEL_DIAMETER_INCHES * 3.1415);
-        static final double     DRIVE_SPEED             = 0.3;
+        static final double     DRIVE_SPEED             = 0.2;
         static final double     TURN_SPEED              = 0.4;
 
         @Override
@@ -64,9 +64,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
             // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
             // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
             frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-            frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
             backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-            backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+            frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+            backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
             frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -89,7 +89,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
             // Step through each leg of the path,
             // Note: Reverse movement is obtained by setting a negative distance (not speed)
-            encoderDrive(DRIVE_SPEED,  20,  20, 3);
+            encoderDrive(DRIVE_SPEED,  3,  3, 0.6);
             //encoderDrive(TURN_SPEED,   5, -5, 0.15);
             //encoderDrive(DRIVE_SPEED, -6, -6, 0.235);
 

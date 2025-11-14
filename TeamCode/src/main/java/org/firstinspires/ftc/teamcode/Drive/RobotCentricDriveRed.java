@@ -61,9 +61,9 @@ public class RobotCentricDriveRed extends LinearOpMode {
 
         //Setting motor direction and config servo for continuous movement.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
         leftTurretMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -102,12 +102,12 @@ public class RobotCentricDriveRed extends LinearOpMode {
             if (gamepad1.left_trigger > 0.000) {
                 axial = axial * 0.55;
                 lateral = lateral * 0.55;
-                yaw = yaw * 0.55;
+                yaw = yaw * 0.75;
             }
             if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
                 axial = axial / 0.55;
                 lateral = lateral / 0.55;
-                yaw = yaw / 0.55;
+                yaw = yaw / 0.75;
             }
 
                 // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -136,7 +136,7 @@ public class RobotCentricDriveRed extends LinearOpMode {
             backLeftDrive.setPower(Math.pow(backLeftPower, 3));
             backRightDrive.setPower(Math.pow(backRightPower, 3));
 
-            if (gamepad2.y){
+            if (gamepad2.b){
                 flywheel.setPower(-1.0);
             }
             if (gamepad2.right_trigger > 0.000000 ) {

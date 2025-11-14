@@ -98,14 +98,14 @@ public class RobotCentricDriveBlue extends LinearOpMode {
 
 //            //This is the dampener code. The robot will slow down by 45% when the left trigger is pressed
             if (gamepad1.left_trigger > 0.000) {
-                axial = axial * 0.55;
-                lateral = lateral * 0.55;
-                yaw = yaw * 0.55;
+                axial = axial * 0.45;
+                lateral = lateral * 0.45;
+                yaw = yaw * 0.75;
             }
             if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
-                axial = axial / 0.55;
-                lateral = lateral / 0.55;
-                yaw = yaw / 0.55;
+                axial = axial / 0.45;
+                lateral = lateral / 0.45;
+                yaw = yaw / 0.75;
             }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -134,7 +134,7 @@ public class RobotCentricDriveBlue extends LinearOpMode {
             backLeftDrive.setPower(Math.pow(backLeftPower, 3));
             backRightDrive.setPower(Math.pow(backRightPower, 3));
 
-            if (gamepad2.y){
+            if (gamepad2.b){
                 flywheel.setPower(-1.0);
             }
             if (gamepad2.right_trigger > 0.000000) {
@@ -195,9 +195,9 @@ public class RobotCentricDriveBlue extends LinearOpMode {
                 }
             } else {
                 if (gamepad2.dpad_left) {
-                    turretMotor.setPower(-0.1);
+                    turretMotor.setPower(-0.3);
                 } else if (gamepad2.dpad_right) {
-                    turretMotor.setPower(0.1);
+                    turretMotor.setPower(0.3);
                 } else {
                     turretMotor.setPower(0);
                 }
