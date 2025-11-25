@@ -3,20 +3,22 @@ package org.firstinspires.ftc.teamcode.Drive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Continuous Servo TEST")
 public class ContinuousServoTEST extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
-    private CRServo testServo;
+    private CRServo testServoleft;
+    private CRServo testServoRight;
 
     @Override
     public void runOpMode() {
-        testServo = hardwareMap.get(CRServo.class, "testServo");
+        testServoleft = hardwareMap.get(CRServo.class, "testServoleft");
+        testServoRight = hardwareMap.get(CRServo.class,"testServoRight");
 
-        testServo.resetDeviceConfigurationForOpMode();
+        testServoleft.resetDeviceConfigurationForOpMode();
+        testServoRight.resetDeviceConfigurationForOpMode();
 
 
         // Wait for the game to start (driver presses START)
@@ -30,11 +32,14 @@ public class ContinuousServoTEST extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             if (gamepad1.a) {
-                testServo.setPower(1.0);
+                testServoleft.setPower(1.0);
+                testServoRight.setPower(-1.0);
             } else if (gamepad1.b) {
-                testServo.setPower(-1.0);
+                testServoleft.setPower(-1.0);
+                testServoRight.setPower(1.0);
             } else {
-                testServo.setPower(0.0);
+                testServoleft.setPower(0.0);
+                testServoRight.setPower(0.0);
             }
 
             }

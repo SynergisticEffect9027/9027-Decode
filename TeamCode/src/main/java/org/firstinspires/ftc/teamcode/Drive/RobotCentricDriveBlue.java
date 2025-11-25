@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import android.util.Size;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -27,8 +28,8 @@ public class RobotCentricDriveBlue extends LinearOpMode {
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
     private DcMotor intakeMotor = null;
-    private DcMotor leftTurretMotor;
-    private DcMotor rightTurretMotor;
+    private DcMotorEx leftTurretMotor;
+    private DcMotorEx rightTurretMotor;
     private DcMotor turretMotor;
     private CRServo flywheel;
     private AprilTagProcessor aprilTag;
@@ -39,6 +40,7 @@ public class RobotCentricDriveBlue extends LinearOpMode {
     private double previousError = 0;
     private double integral = 0;
     private Boolean turretEnable = true;
+    private double ticksPerRev = 28;
 
 
     @Override
@@ -53,8 +55,8 @@ public class RobotCentricDriveBlue extends LinearOpMode {
         turretMotor = hardwareMap.get(DcMotor.class, "turretMotor");
         flywheel = hardwareMap.get(CRServo.class, "Flywheel");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
-        leftTurretMotor = hardwareMap.get(DcMotor.class, "leftTurretMotor");
-        rightTurretMotor = hardwareMap.get(DcMotor.class, "rightTurretMotor");
+        leftTurretMotor = hardwareMap.get(DcMotorEx.class, "leftTurretMotor");
+        rightTurretMotor = hardwareMap.get(DcMotorEx.class, "rightTurretMotor");
 
 
         //Setting motor direction and config servo for continuous movement.
@@ -67,6 +69,12 @@ public class RobotCentricDriveBlue extends LinearOpMode {
         leftTurretMotor.setDirection(DcMotor.Direction.REVERSE);
         rightTurretMotor.setDirection(DcMotor.Direction.FORWARD);
         flywheel.resetDeviceConfigurationForOpMode();
+
+        leftTurretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightTurretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftTurretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightTurretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -98,14 +106,14 @@ public class RobotCentricDriveBlue extends LinearOpMode {
 
 //            //This is the dampener code. The robot will slow down by 45% when the left trigger is pressed
             if (gamepad1.left_trigger > 0.000) {
-                axial = axial * 0.45;
-                lateral = lateral * 0.45;
-                yaw = yaw * 0.75;
+                axial = axial * 0.55;
+                lateral = lateral * 0.65;
+                yaw = yaw * 0.65;
             }
             if (gamepad1.left_trigger > 0.000 && gamepad1.left_trigger < 0.001) {
-                axial = axial / 0.45;
-                lateral = lateral / 0.45;
-                yaw = yaw / 0.75;
+                axial = axial / 0.55;
+                lateral = lateral / 0.65;
+                yaw = yaw / 0.65;
             }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -152,61 +160,65 @@ public class RobotCentricDriveBlue extends LinearOpMode {
                 intakeMotor.setPower(0.0);
             }
             if (gamepad2.left_trigger > 0.0000) {
-                leftTurretMotor.setPower(1.0);
-                rightTurretMotor.setPower(1.0);
-
+                leftTurretMotor.setVelocity((5000*ticksPerRev)/60);
+                rightTurretMotor.setVelocity((5000*ticksPerRev)/60);
+            } else if (gamepad2.left_bumper) {
+                leftTurretMotor.setVelocity((2600*ticksPerRev)/60);
+                rightTurretMotor.setVelocity((2600*ticksPerRev)/60);
             } else {
                 leftTurretMotor.setPower(0);
                 rightTurretMotor.setPower(0);
             }
 
-            List<AprilTagDetection> detections = aprilTag.getDetections();
-            if  (gamepad2.b){
-                turretEnable = !turretEnable;
-            }
-
-            if (turretEnable) {
-                AprilTagDetection redGoalTag = null;
-
-                for (AprilTagDetection tag : detections) {
-                    if (tag.id == 20) {
-                        redGoalTag = tag;
-                        break;
-                    }
-                }
-
-                if (redGoalTag != null) {
-                    double targetX = redGoalTag.center.x;
-                    double imageCenterX = 640 / 2.0;
-                    double error = targetX - imageCenterX;
-
-                    integral += error;
-                    double derivative = error - previousError;
-
-                    double output = (kP * error) + (kI * integral) + (kD * derivative);
-                    output = Math.max(-0.3, Math.min(0.3, output));
-
-                    turretMotor.setPower(output);
-                    previousError = error;
-                    telemetry.addData("Error", error);
-                } else {
-                    turretMotor.setPower(0);
-                    telemetry.addLine("No target detected");
-                }
-            } else {
-                if (gamepad2.dpad_left) {
-                    turretMotor.setPower(-0.3);
-                } else if (gamepad2.dpad_right) {
-                    turretMotor.setPower(0.3);
-                } else {
-                    turretMotor.setPower(0);
-                }
-            }
+//            List<AprilTagDetection> detections = aprilTag.getDetections();
+//            if  (gamepad2.b){
+//                turretEnable = !turretEnable;
+//            }
+//
+//            if (turretEnable) {
+//                AprilTagDetection redGoalTag = null;
+//
+//                for (AprilTagDetection tag : detections) {
+//                    if (tag.id == 20) {
+//                        redGoalTag = tag;
+//                        break;
+//                    }
+//                }
+//
+//                if (redGoalTag != null) {
+//                    double targetX = redGoalTag.center.x;
+//                    double imageCenterX = 640 / 2.0;
+//                    double error = targetX - imageCenterX;
+//
+//                    integral += error;
+//                    double derivative = error - previousError;
+//
+//                    double output = (kP * error) + (kI * integral) + (kD * derivative);
+//                    output = Math.max(-0.3, Math.min(0.3, output));
+//
+//                    turretMotor.setPower(output);
+//                    previousError = error;
+//                    telemetry.addData("Error", error);
+//                } else {
+//                    turretMotor.setPower(0);
+//                    telemetry.addLine("No target detected");
+//                }
+//            } else {
+//                if (gamepad2.dpad_left) {
+//                    turretMotor.setPower(-0.3);
+//                } else if (gamepad2.dpad_right) {
+//                    turretMotor.setPower(0.3);
+//                } else {
+//                    turretMotor.setPower(0);
+//                }
+//            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
+            telemetry.addData("Turrent Velocity Left", leftTurretMotor.getVelocity());
+            telemetry.addData("Turrent Velocity Right", rightTurretMotor.getVelocity());
             telemetry.update();
         }
     }
